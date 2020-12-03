@@ -1,14 +1,23 @@
 import ast
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host = 'localhost',
+  user = 'root',
+  passwd = 'sumeet@1996',
+  database = 'python_login'
+)
+
+mycursor = mydb.cursor()
 
 def login(email,passw):
-  checker = False
-  file = open('database.txt', 'r')
-  content = ast.literal_eval(file.read())
-  while checker == False:
-    if email == content['email'] and passw == content['password']:
+  sqlFormulaSELECT = 'SELECT * FROM user WHERE email = %s'
+  mycursor.execute(sqlFormulaSELECT,(email,))
+  myresult = mycursor.fetchall()
+  for result in myresult:
+    if passw == result[2]:
       print("Login Success")
-      print("Name is {name} with email {email} and password {password}".format(**content))
-      checker = True
+      print("Name is {} with email {} and password {}".format(result[0], result[1], result[2]))
     else:
       print("*Wrong Credentials, please try again!!!*")
       main_login()

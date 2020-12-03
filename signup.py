@@ -1,19 +1,28 @@
+import mysql.connector
+
 # Saving User Inputs in a dictionary
 def saveInfo(name, email):
+
+  # Databse Initialization
+  mydb = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'sumeet@1996',
+    database = 'python_login'
+  )
+
+  mycursor = mydb.cursor()
+  sqlFormulaInsert = 'INSERT INTO user (name, email, password) VALUES(%s, %s, %s)'
+
   checker = False
   while checker == False:
     password = input("Enter your password: ")
     re_password = input("Enter your password again: ")
     if password == re_password:
-      info_dict = {
-        "name": name,
-        "email": email,
-        "password": password
-      }
       try:
-        save_info = open('database.txt', 'wt')
-        save_info.write(str(info_dict))
-        save_info.close()
+        info_tup = (name, email, password)
+        mycursor.execute(sqlFormulaInsert, info_tup)
+        mydb.commit()
         checker = True
         return "Signup Success"
       except:
@@ -27,3 +36,4 @@ def main_signup():
   name = input("Enter your name: ")
   email = input("Enter your email: ")
   print(saveInfo(name, email))
+
