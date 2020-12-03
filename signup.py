@@ -15,25 +15,36 @@ def saveInfo(name, email):
   sqlFormulaInsert = 'INSERT INTO user (name, email, password) VALUES(%s, %s, %s)'
 
   checker = False
+  email_exist = False
   while checker == False:
     password = input("Enter your password: ")
     re_password = input("Enter your password again: ")
     if password == re_password:
-      try:
-        info_tup = (name, email, password)
-        mycursor.execute(sqlFormulaInsert, info_tup)
-        mydb.commit()
-        checker = True
-        return "Signup Success"
-      except:
-        print("Unable to write to database")
+      mycursor.execute("SELECT email FROM user WHERE email=%s", (email,))
+      result = mycursor.fetchall()
+      if len(result) == 0:
+        try:
+          info_tup = (name, email, password)
+          mycursor.execute(sqlFormulaInsert, info_tup)
+          mydb.commit()
+          checker = True
+          print("Signup Success")
+        except:
+          print("Unable to write to database")
+      else:
+        email_exist = True
+        print("Email already exist!! Please try again")
+        break
     else:
       print("Your passwords are not matching please try again")
+  
+  if email_exist == True:
+    main_signup()
 
 # User Inputs
 def main_signup():
   print("*Signup Form*")
   name = input("Enter your name: ")
   email = input("Enter your email: ")
-  print(saveInfo(name, email))
+  saveInfo(name, email)
 
